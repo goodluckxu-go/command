@@ -5,7 +5,6 @@ import (
 	"github.com/gookit/color"
 	"os"
 	"regexp"
-	"strings"
 )
 
 type Cmd struct {
@@ -16,6 +15,7 @@ type Cmd struct {
 	runCommand       Command
 	commandOtherOpts []string
 	runOptions       []Option
+	searchGroup      string
 }
 
 func New() *Cmd {
@@ -42,26 +42,11 @@ func (c *Cmd) Run(opts ...string) {
 	// 增加系统参数
 	c.SetOptions(&version{}, &daemon{})
 	c.valid(opts...)
-	groupSearch := ""
-	if len(opts) > 1 {
-		opt := opts[1]
-		if c.Exec(opts...) {
-			return
-		}
-		group := strings.Split(opt, ":")[0]
-		for _, cmd := range c.commands {
-			explain := cmd.Explain()
-			if explain.Group != "" && explain.Group == group {
-				groupSearch = group
-				break
-			}
-		}
-		if group != opt || groupSearch == "" {
-			errorSuggest(opt, c.commands)
-		}
+	if len(opts) > 1 && c.searchGroup == "" && c.Exec(opts...) {
+		return
 	}
 	s := help(c)
-	s += commandMsg(groupSearch, c.commands)
+	s += commandMsg(c.searchGroup, c.commands)
 	color.Println(s)
 }
 
@@ -110,6 +95,12 @@ func (c *Cmd) valid(opts ...string) {
 				if cmd, ok := c.execMap[opt].(Command); ok {
 					c.runCommand = cmd
 				} else {
+					for _, command := range c.commands {
+						if command.Explain().Group == opt {
+							c.searchGroup = opt
+							return
+						}
+					}
 					errorSuggest(opt, c.commands)
 				}
 			} else {
