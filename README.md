@@ -7,7 +7,7 @@
 import "github.com/goodluckxu-go/command"
 ~~~
 
-命令文件
+命令文件(command)
 ~~~go
 type Test struct {
 }
@@ -28,12 +28,30 @@ func (t *Test) Handle(ctx context.Context, args ...string) {
 }
 ~~~
 
+选项文件(option)
+~~~go
+type Kill struct {
+}
+
+func (k *Kill) Explain() *ExplainOption {
+	return &ExplainOption{
+		Commands: []string{"-k", "--kill"},
+		Notes:    "删掉程序",
+	}
+}
+
+func (k *Kill) Handle(ctx context.Context, args ...string) {
+	fmt.Println("已经删除程序")
+}
+~~~
+
 调用方法
 ~~~go
 func main() {
 	cmd := command.New()
 	cmd.SetUsage("command [options] [arguments]") // 可设置，不设置默认值 command [options] [arguments]
-	cmd.SetCommands(&Test{})
+    c.SetOptions(&Kill{}) // 设置选项，选项执行在命令之前
+	cmd.SetCommands(&Test{}) // 设置命令
 	cmd.Run(os.Args...)
 }
 ~~~
