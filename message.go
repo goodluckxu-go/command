@@ -23,7 +23,7 @@ func versionMsg() string {
 func usageMsg(opt string) string {
 	s := ""
 	if opt == "" {
-		return s
+		opt = "command [options] [arguments]"
 	}
 	s = "<fg=yellow>Usage:</>\n"
 	s += "  " + opt + "\n\n"
