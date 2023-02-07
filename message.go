@@ -192,7 +192,7 @@ func errorSuggest(cmd string, opts []Command) {
 	var suggestList []string
 	for _, o := range opts {
 		c := commandKey(o)
-		if len(c)-len(strings.TrimPrefix(c, group)) > 0 {
+		if len(c)-len(strings.TrimPrefix(c, group)) > 0 || strings.Index(c, cmd) != -1 {
 			suggestList = append(suggestList, c)
 		}
 	}
