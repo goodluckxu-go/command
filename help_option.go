@@ -35,7 +35,7 @@ func (h *helpOption) Handle(ctx context.Context, args ...string) {
 		s += "  <fg=green>-V, --version</>\n"
 		s += "    查看命令版本\n"
 		s += "  <fg=green>-d, --daemon</>\n"
-		s += "    command -d 命来后台执行，目前只限于支持shell脚本的系统\n"
+		s += "    command -d 命令后台执行，目前只限于支持shell脚本的系统\n"
 		s += "  <fg=green>-h, --help</>\n"
 		s += "    [command] -h 查看命令帮助手册，命令定义在Help中\n"
 		color.Print(s)
