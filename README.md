@@ -1,0 +1,2 @@
+# command
+golang类似laravel的artisan的自定义命令生成工具
