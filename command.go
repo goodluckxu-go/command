@@ -5,6 +5,7 @@ import (
 	"github.com/gookit/color"
 	"os"
 	"regexp"
+	"strings"
 )
 
 type Cmd struct {
@@ -16,6 +17,7 @@ type Cmd struct {
 	commandOtherOpts []string
 	runOptions       []Option
 	searchGroup      string
+	isHelp           bool
 }
 
 func New() *Cmd {
@@ -40,14 +42,14 @@ func (c *Cmd) SetCommands(opts ...Command) {
 // 执行输出
 func (c *Cmd) Run(opts ...string) {
 	// 增加系统参数
-	c.SetOptions(&version{}, &daemon{})
+	c.SetOptions(&versionOption{}, &daemonOption{}, &helpOption{})
 	c.valid(opts...)
 	if len(opts) > 1 && c.searchGroup == "" && c.Exec(opts...) {
 		return
 	}
 	s := help(c)
 	s += commandMsg(c.searchGroup, c.commands)
-	color.Println(s)
+	color.Print(s)
 }
 
 func (c *Cmd) valid(opts ...string) {
@@ -92,6 +94,17 @@ func (c *Cmd) valid(opts ...string) {
 			}
 		} else {
 			if c.runCommand == nil {
+				tmpList := strings.Split(opt, "/")
+				if len(tmpList) == 1 {
+					opt = tmpList[0]
+				} else if len(tmpList) == 2 {
+					opt = tmpList[0]
+					if tmpList[1] == "help" {
+						c.isHelp = true
+					}
+				} else {
+					errorSuggest(opt, c.commands)
+				}
 				if cmd, ok := c.execMap[opt].(Command); ok {
 					c.runCommand = cmd
 				} else {
@@ -117,6 +130,23 @@ func (c *Cmd) Exec(opts ...string) bool {
 	// 参数
 	for _, opt := range c.runOptions {
 		opt.Handle(context.Background(), opts...)
+		os.Exit(0)
+	}
+	// 帮助
+	if c.isHelp {
+		explain := c.runCommand.Explain()
+		cmd := ""
+		if explain.Group != "" {
+			cmd += explain.Group + ":"
+		}
+		cmd += explain.Command
+		if explain.Help == nil {
+			errorMsg("No help document for command \"" + cmd + "\"")
+		}
+		s := help(c)
+		s += "<fg=yellow>Command \"" + cmd + "\" Help:</>"
+		color.Println(s)
+		explain.Help()
 		os.Exit(0)
 	}
 	// 命令

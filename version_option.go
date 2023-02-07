@@ -5,16 +5,16 @@ import (
 	"github.com/gookit/color"
 )
 
-type version struct {
+type versionOption struct {
 }
 
-func (v *version) Explain() *ExplainOption {
+func (v *versionOption) Explain() *ExplainOption {
 	return &ExplainOption{
 		Commands: []string{"-V", "--version"},
 		Notes:    "版本号",
 	}
 }
 
-func (v *version) Handle(ctx context.Context, args ...string) {
+func (v *versionOption) Handle(ctx context.Context, args ...string) {
 	color.Println(versionMsg())
 }

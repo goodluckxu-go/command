@@ -7,17 +7,17 @@ import (
 	"path/filepath"
 )
 
-type daemon struct {
+type daemonOption struct {
 }
 
-func (d *daemon) Explain() *ExplainOption {
+func (d *daemonOption) Explain() *ExplainOption {
 	return &ExplainOption{
 		Commands: []string{"-d", "--daemon"},
 		Notes:    "守护进程执行",
 	}
 }
 
-func (d *daemon) Handle(ctx context.Context, args ...string) {
+func (d *daemonOption) Handle(ctx context.Context, args ...string) {
 	var newArgs []string
 	for _, arg := range args {
 		if arg == "-d" || arg == "--daemon" {
